@@ -1,0 +1,16 @@
+# Robots.txt untuk Berkah Mebel Ayu
+# https://berkahmebelayu.com
+
+User-agent: *
+Allow: /
+
+# Block access to sensitive directories
+Disallow: /admin/
+Disallow: /api/
+Disallow: /config.php
+Disallow: /db_config.php
+Disallow: /users.json
+Disallow: /.htaccess
+
+# Sitemap
+Sitemap: https://berkahmebelayu.com/sitemap.xml
