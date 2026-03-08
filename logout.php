@@ -1,14 +1,22 @@
 <?php
 session_start();
 
-// Logout user
-unset($_SESSION['user_id']);
-unset($_SESSION['user_email']);
-unset($_SESSION['user_name']);
-unset($_SESSION['logged_in']);
+// Clear all session variables
+$_SESSION = [];
 
+// Destroy the session
 session_destroy();
 
+// Delete session cookie
+if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000,
+        $params["path"], $params["domain"],
+        $params["secure"], $params["httponly"]
+    );
+}
+
+// Redirect to home
 header('Location: index.php');
 exit;
 ?>

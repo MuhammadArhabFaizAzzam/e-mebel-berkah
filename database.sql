@@ -162,6 +162,68 @@ INSERT INTO `products` (`name`, `category`, `description`, `price`, `discount_pr
 ('Kursi Teras Minimalis', 'Kursi', 'Kursi teras dengan desain minimalis dan bahan tahan cuaca', 280000, 224000, 20, 'kursi-teras.jpg', FALSE);
 
 -- ===========================
+-- Tabel Admin Users (Untuk Multiple Admin)
+-- ===========================
+CREATE TABLE IF NOT EXISTS `admin_users` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `username` VARCHAR(50) NOT NULL UNIQUE,
+  `email` VARCHAR(100) NOT NULL UNIQUE,
+  `password` VARCHAR(255) NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `role` ENUM('super_admin', 'admin', 'editor') DEFAULT 'admin',
+  `is_active` BOOLEAN DEFAULT TRUE,
+  `last_login` TIMESTAMP NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert default admin (password: admin123)
+-- Password dihash dengan bcrypt
+INSERT IGNORE INTO `admin_users` (`username`, `email`, `password`, `name`, `role`) VALUES
+('admin', 'admin@berkahmebelayu.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin Utama', 'super_admin');
+
+-- ===========================
+-- Tabel Kontak/Message dari User
+-- ===========================
+CREATE TABLE IF NOT EXISTS `contacts` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100) NOT NULL,
+  `phone` VARCHAR(20),
+  `subject` VARCHAR(200),
+  `message` TEXT NOT NULL,
+  `is_read` BOOLEAN DEFAULT FALSE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ===========================
+-- Tabel Konfigurasi Website
+-- ===========================
+CREATE TABLE IF NOT EXISTS `settings` (
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `setting_key` VARCHAR(50) NOT NULL UNIQUE,
+  `setting_value` TEXT,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Insert default settings
+INSERT IGNORE INTO `settings` (`setting_key`, `setting_value`) VALUES
+('site_name', 'Berkah Mebel Ayu'),
+('site_description', 'Toko Furniture Berkualitas'),
+('contact_phone', '081234567890'),
+('contact_wa', '081234567890'),
+('contact_address', 'Jl. Contoh No. 123, Jakarta'),
+('shipping_cost', '25000'),
+('free_shipping_min', '500000');
+
+-- ===========================
+-- Tambahkan kolom is_flash_sale ke products jika belum ada
+-- ===========================
+ALTER TABLE `products` ADD COLUMN `is_flash_sale` BOOLEAN DEFAULT FALSE AFTER `status`;
+ALTER TABLE `products` ADD COLUMN `flash_sale_price` DECIMAL(10, 2) NULL AFTER `is_flash_sale`;
+ALTER TABLE `products` ADD COLUMN `flash_sale_end` DATETIME NULL AFTER `flash_sale_price`;
+
+-- ===========================
 -- Index untuk performa
 -- ===========================
 CREATE INDEX `idx_user_email` ON `users`(`email`);
@@ -170,3 +232,5 @@ CREATE INDEX `idx_cart_user` ON `cart`(`user_id`);
 CREATE INDEX `idx_order_user` ON `orders`(`user_id`);
 CREATE INDEX `idx_review_user` ON `reviews`(`user_id`);
 CREATE INDEX `idx_review_product` ON `reviews`(`product_id`);
+CREATE INDEX `idx_admin_email` ON `admin_users`(`email`);
+CREATE INDEX `idx_admin_username` ON `admin_users`(`username`);
